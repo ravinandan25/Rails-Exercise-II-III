@@ -4,6 +4,7 @@
 <% if current_user %>
   Logged in as <%= current_user.email %>.
   <%= link_to "Log Out", logout_path %>
+  <%= link_to "Go to Profile", user_path(current_user.id)%>
 <% else %>
   <%= link_to "Sign Up", new_user_path %> or 
   <%= link_to "Log In", new_session_path %>
