@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[show edit update destroy]
-  before_action :require_login, except: [:new, :create]
-  
+  before_action :require_login, except: %i[new create]
+
   # GET /users or /users.json
   def index
     @users = User.all
@@ -9,7 +9,7 @@ class UsersController < ApplicationController
 
   # GET /users/1 or /users/1.json
   def show
-    if current_user.id!=@user.id
+    if current_user.id != @user.id
       redirect_to users_path
       flash[:notice] = "You can only view your details i.e. #{current_user.email}."
     end
@@ -17,16 +17,20 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    @user = User.new
+    if current_user.nil?
+      @user = User.new
+    else
+      redirect_to users_path, notice: 'You already LogedIn'
+    end
   end
 
   # GET /users/1/edit
   def edit
-    if current_user.id!=@user.id
+    if current_user.id != @user.id
       redirect_to users_path
       flash[:notice] = "You can only edit your details i.e  #{current_user.email}"
     end
-   end
+  end
 
   # POST /users or /users.json
   def create
@@ -57,8 +61,8 @@ class UsersController < ApplicationController
   end
 
   # DELETE /users/1 or /users/1.json
-  def destroy    
-    if current_user.id!=@user.id
+  def destroy
+    if current_user.id != @user.id
       redirect_to users_path
       flash[:notice] = "You can only delete your Profile i.e. #{current_user.email}."
     else
@@ -77,10 +81,9 @@ class UsersController < ApplicationController
   def set_user
     @user = User.find(params[:id])
   end
+
   def require_login
-    unless current_user      
-      redirect_to login_url , alert: "You must be logged in to access this section"
-    end
+    redirect_to login_url, alert: 'You must be logged in to access this section' unless current_user
   end
 
   # Only allow a list of trusted parameters through.
